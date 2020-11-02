@@ -1,0 +1,162 @@
+<html>
+<head>
+	<script type="text/javascript">
+	var canvas,
+		parent_div,
+		pen,
+		erase,
+		ctx, 
+		flag = false,
+		prevX = 0,
+		currX = 0,
+		prevY = 0,
+		currY = 0,
+		dot_flag = false,
+		eraser = false;
+		offsetLeft = 0
+		offsetTop = 0;
+
+	var pen_color = "black",
+		pen_width = 2;
+	
+	function init() {
+		parent_div = document.getElementById('the-palace');
+		offsetLeft = parent_div.offsetLeft;
+		offsetTop = parent_div.offsetTop;
+
+		canvas = document.getElementById('can');
+		pen = document.getElementById('pen');
+		erase = document.getElementById('erase');
+		pen.checked = true;
+		console.log(parent_div.offsetWidth);
+		canvas.width = parent_div.offsetWidth;
+		canvas.height = parent_div.offsetHeight;
+
+		ctx = canvas.getContext("2d");
+		w = canvas.width;
+		h = canvas.height;
+
+		console.log(w);
+
+		canvas.addEventListener("mousemove", function (e) {
+			findxy('move', e)
+		}, false);
+		canvas.addEventListener("mousedown", function (e) {
+			findxy('down', e)
+		}, false);
+		canvas.addEventListener("mouseup", function (e) {
+			findxy('up', e)
+		}, false);
+		canvas.addEventListener("mouseout", function (e) {
+			findxy('out', e)
+		}, false);
+	}
+	
+	function color(obj) {
+		let color = obj.value.toLowerCase();
+		pen_color = color;
+		selectPen();
+	}
+	
+	function draw() {
+		if(eraser) {
+				ctx.clearRect(currX, currY, 15, 15);
+		} else {
+			ctx.beginPath();
+			ctx.moveTo(prevX, prevY);
+			ctx.lineTo(currX, currY);
+			ctx.strokeStyle = pen_color;
+			ctx.lineWidth = pen_width;
+			ctx.stroke();
+			ctx.closePath();
+		}
+	}
+	
+	function eraseLine() {
+		// var m = confirm("Want to clear");
+		// if (m) {
+		ctx.clearRect(0, 0, w, h);
+		// }
+	}
+	
+	function save() {
+		// var dataURL = canvas.toDataURL();
+		document.getElementById("downloader").download = "image.png";
+    	document.getElementById("downloader").href = canvas.toDataURL("image/png").replace(/^data:image\/[^;]/, 'data:application/octet-stream');
+		// download.setAttribute("href", image);
+	}
+	
+	function findxy(res, e) {
+		
+		if (res == 'down') {
+			prevX = currX;
+			prevY = currY;
+			currX = e.clientX - canvas.offsetLeft - offsetLeft;
+			currY = e.clientY - canvas.offsetTop - offsetTop;
+	
+			flag = true;
+			dot_flag = true;
+			if(eraser) {
+				ctx.clearRect(currX, currY, 15, 15);
+			} else if (dot_flag) {
+				ctx.beginPath();
+				ctx.fillStyle = pen_color;
+				ctx.fillRect(currX, currY, 2, 2);
+				ctx.closePath();
+				dot_flag = false;
+			}
+		}
+		if (res == 'up' || res == "out") {
+			flag = false;
+		}
+		if (res == 'move') {
+			if (flag) {
+				prevX = currX;
+				prevY = currY;
+				currX = e.clientX - canvas.offsetLeft - offsetLeft;
+				currY = e.clientY - canvas.offsetTop - offsetTop;
+				draw();
+			}
+		}
+	}
+
+	function selectPen() {
+		pen.checked = true;
+		erase.checked = false;
+		eraser = false;
+	}
+
+	function selectErase() {
+		pen.checked = false;
+		erase.checked = true;
+		eraser = true;
+	}
+
+	function loadimage() {
+		
+	}
+
+	</script>
+</head>
+<body style="background:#ddd;" onload="init()">
+	<div id="the-palace" style="margin: 20px auto; max-width: 1000px; position:relative; min-height: 500px;">
+		<div style="width:100%; height: 20px; display: inline-flex">
+			<input type="checkbox" id="pen" onchange="selectPen()">Pen</input>
+			<input type="checkbox" id="erase" onchange="selectErase()" style="margin-left: 10px;">Eraser</input>
+			<div style="margin-left: 20px;">Select Color</div>
+			<select onchange="color(this);" class="color" id="list-color" style="margin-left: 10px;">
+				<option id="black" value="Black">Black</option>
+				<option id="green" value="Green">Green</option>
+				<option id="blue" value="Blue">Blue</option>
+				<option id="red" value="Red">Red</option>
+				<option id="pink" value="Pink">Pink</option>
+				<option id="yellow" value="Yellow">Yellow</option>
+			</select>
+			<button style="margin-left: 20px;" onclick="save()">Save</button>
+			<input onchange="loadimage()">Load</input>
+			<a href="#" id="downloader" download="image.png">Download!</a>
+		</div>
+		<canvas id="can" style="position:absolute;top:20px;left:0; width:100%; height:100%; background: white;"></canvas>
+	</div>
+</body>
+</html>
