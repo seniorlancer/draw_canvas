@@ -10,6 +10,7 @@
 		reader,
 		selectedText,
 		flag = false,
+		selectedTextMove = false;
 		prevX = 0,
 		currX = 0,
 		prevY = 0,
@@ -111,7 +112,10 @@
 		input.style.background = 'transparent';
 
 		input.onkeydown = handleTextAreaEnter;
-		input.onclick = handleTextAreaClick;
+		input.onmousedown = handleTextAreaClick;
+		input.addEventListener('mouseup', function(e){
+			selectedTextMove = false;
+		});
 		document.body.appendChild(input);
 
 		input.focus();
@@ -141,9 +145,10 @@
 	function handleTextAreaClick(e) {
 		leaveTextArea();
 		this.style.resize = 'auto';
+		selectedTextMove = true;
 		selectedText = this;
 	}
-
+ 
 	function drawText(txt, x, y) {
 		ctx.textBaseline = 'top';
 		ctx.textAlign = 'left';
@@ -152,11 +157,10 @@
 	}
 
 	function findxy(res, e) {
-		if(tool === 3) {
-			return;
-		}
-
 		if (res == 'down') {
+			if(tool === 3) {
+				return;
+			}
 			prevX = currX;
 			prevY = currY;
 			currX = e.clientX - canvas.offsetLeft - offsetLeft;
@@ -176,9 +180,13 @@
 		}
 		if (res == 'up' || res == "out") {
 			flag = false;
+			selectedTextMove = false;
 		}
 		if (res == 'move') {
-			if (flag) {
+			if(selectedText && selectedTextMove) {
+				selectedText.style.left = e.clientX - canvas.offsetLeft;
+				selectedText.style.top = e.clientY - canvas.offsetTop;
+			} else if (flag) {
 				prevX = currX;
 				prevY = currY;
 				currX = e.clientX - canvas.offsetLeft - offsetLeft;
