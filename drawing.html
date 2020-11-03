@@ -11,6 +11,7 @@
 		selectedText,
 		flag = false,
 		selectedTextMove = false;
+		overCanvas = true;
 		prevX = 0,
 		currX = 0,
 		prevY = 0,
@@ -110,12 +111,17 @@
 		input.style.left = (currX) + 'px';
 		input.style.top = (currY) + 'px';
 		input.style.background = 'transparent';
+		input.style.overflow = 'hidden';
 
 		input.onkeydown = handleTextAreaEnter;
 		input.onmousedown = handleTextAreaClick;
 		input.addEventListener('mouseup', function(e){
 			selectedTextMove = false;
 		});
+		input.addEventListener('mousemove', function(e){
+			findxy('move', e)
+		});
+
 		document.body.appendChild(input);
 
 		input.focus();
@@ -127,7 +133,12 @@
 			selectedText.style.border = 'none';
 			selectedText.style.resize = 'none';
 			if(selectedText.value === '') {
-				document.body.removeChild(selectedText)
+				console.log(selectedText);
+				try {
+					document.body.removeChild(selectedText)
+				}catch{
+					
+				}
 			}
 		}
 	}
@@ -179,14 +190,20 @@
 			}
 		}
 		if (res == 'up' || res == "out") {
-			flag = false;
-			selectedTextMove = false;
+			console.log('111111111');
+			if(overCanvas){
+				flag = false;
+			}
+			if(!selectedText) {
+				selectedTextMove = false;
+			}
 		}
 		if (res == 'move') {
 			if(selectedText && selectedTextMove) {
 				selectedText.style.left = e.clientX - canvas.offsetLeft;
-				selectedText.style.top = e.clientY - canvas.offsetTop;
+				selectedText.style.top = e.clientY - canvas.offsetTop + 20;
 			} else if (flag) {
+				overCanvas = true;
 				prevX = currX;
 				prevY = currY;
 				currX = e.clientX - canvas.offsetLeft - offsetLeft;
