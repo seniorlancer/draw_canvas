@@ -61,9 +61,8 @@
 		}, false);
 		canvas.addEventListener('click', function(e) {
 			if(tool === 3) {
-				if(selectedText) 
-					selectedText.style.border = 'none';
-					clickCanvas(e);
+				leaveTextArea();
+				clickCanvas(e);
 			}
 		}, false);
 	}
@@ -109,23 +108,40 @@
 		input.style.position = 'fixed';
 		input.style.left = (currX) + 'px';
 		input.style.top = (currY) + 'px';
-		input.oninput = 'this.style.height = "";this.style.height = this.scrollHeight + "px"';
+		input.style.background = 'transparent';
 
-		input.onkeydown = handleEnter;
-
+		input.onkeydown = handleTextAreaEnter;
+		input.onclick = handleTextAreaClick;
 		document.body.appendChild(input);
 
 		input.focus();
 		hasInput = true;
 	}
 
-	function handleEnter(e) {
-		var keyCode = e.keyCode;
+	function leaveTextArea() {
+		if(selectedText){
+			selectedText.style.border = 'none';
+			selectedText.style.resize = 'none';
+			if(selectedText.value === '') {
+				document.body.removeChild(selectedText)
+			}
+		}
+	}
+
+	function handleTextAreaEnter(e) {
+		this.style.height = 0;
+		this.style.height = this.scrollHeight + 3;
 		// if (keyCode === 13) {
 			// drawText(this.value, parseInt(currX - offsetLeft, 10), parseInt(currY - offsetTop - 20, 10));
 			// document.body.removeChild(this);
 			// hasInput = false;
 		// }
+	}
+
+	function handleTextAreaClick(e) {
+		leaveTextArea();
+		this.style.resize = 'auto';
+		selectedText = this;
 	}
 
 	function drawText(txt, x, y) {
@@ -176,6 +192,7 @@
 		pen.checked = true;
 		erase.checked = false;
 		text.checked = false;
+		leaveTextArea();
 		tool = 1;
 	}
 
@@ -183,6 +200,7 @@
 		pen.checked = false;
 		erase.checked = true;
 		text.checked = false;
+		leaveTextArea();
 		tool = 2;
 	}
 
