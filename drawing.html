@@ -5,17 +5,21 @@
 		parent_div,
 		pen,
 		erase,
+		text,
 		ctx, 
 		reader,
+		selectedText,
 		flag = false,
 		prevX = 0,
 		currX = 0,
 		prevY = 0,
 		currY = 0,
 		dot_flag = false,
-		eraser = false;
+		tool = 1; // 1:pen, 2:erase, 3:text
 		offsetLeft = 0
-		offsetTop = 0;
+		offsetTop = 0,
+		hasInput = false,
+		font = '14px sans-serif';
 
 	var pen_color = "black",
 		pen_width = 2;
@@ -31,6 +35,7 @@
 		canvas = document.getElementById('can');
 		pen = document.getElementById('pen');
 		erase = document.getElementById('erase');
+		text = document.getElementById('text');
 		pen.checked = true;
 		console.log(parent_div.offsetWidth);
 		canvas.width = parent_div.offsetWidth;
@@ -54,6 +59,13 @@
 		canvas.addEventListener("mouseout", function (e) {
 			findxy('out', e)
 		}, false);
+		canvas.addEventListener('click', function(e) {
+			if(tool === 3) {
+				if(selectedText) 
+					selectedText.style.border = 'none';
+					clickCanvas(e);
+			}
+		}, false);
 	}
 	
 	function color(obj) {
@@ -63,9 +75,9 @@
 	}
 	
 	function draw() {
-		if(eraser) {
-				ctx.clearRect(currX, currY, 15, 15);
-		} else {
+		if(tool === 2) {
+			ctx.clearRect(currX, currY, 15, 15);
+		} else if(tool === 1) {
 			ctx.beginPath();
 			ctx.moveTo(prevX, prevY);
 			ctx.lineTo(currX, currY);
@@ -85,8 +97,49 @@
     	document.getElementById("downloader").href = canvas.toDataURL("image/png");
 	}
 	
+	function clickCanvas(e) {
+		currX = e.clientX - canvas.offsetLeft;
+		currY = e.clientY - canvas.offsetTop;
+
+		console.log(currX + '-' + currY);
+
+		var input = document.createElement('textarea');
+		selectedText = input;
+		input.type = 'text';
+		input.style.position = 'fixed';
+		input.style.left = (currX) + 'px';
+		input.style.top = (currY) + 'px';
+		input.oninput = 'this.style.height = "";this.style.height = this.scrollHeight + "px"';
+
+		input.onkeydown = handleEnter;
+
+		document.body.appendChild(input);
+
+		input.focus();
+		hasInput = true;
+	}
+
+	function handleEnter(e) {
+		var keyCode = e.keyCode;
+		// if (keyCode === 13) {
+			// drawText(this.value, parseInt(currX - offsetLeft, 10), parseInt(currY - offsetTop - 20, 10));
+			// document.body.removeChild(this);
+			// hasInput = false;
+		// }
+	}
+
+	function drawText(txt, x, y) {
+		ctx.textBaseline = 'top';
+		ctx.textAlign = 'left';
+		ctx.font = font;
+		ctx.fillText(txt, x, y);
+	}
+
 	function findxy(res, e) {
-		
+		if(tool === 3) {
+			return;
+		}
+
 		if (res == 'down') {
 			prevX = currX;
 			prevY = currY;
@@ -95,7 +148,7 @@
 	
 			flag = true;
 			dot_flag = true;
-			if(eraser) {
+			if(tool === 2) {
 				ctx.clearRect(currX, currY, 15, 15);
 			} else if (dot_flag) {
 				ctx.beginPath();
@@ -122,13 +175,22 @@
 	function selectPen() {
 		pen.checked = true;
 		erase.checked = false;
-		eraser = false;
+		text.checked = false;
+		tool = 1;
 	}
 
 	function selectErase() {
 		pen.checked = false;
 		erase.checked = true;
-		eraser = true;
+		text.checked = false;
+		tool = 2;
+	}
+
+	function selectText() {
+		pen.checked = false;
+		erase.checked = false;
+		text.checked = true;
+		tool = 3;
 	}
 
 	function loadimage(event) {
@@ -162,6 +224,7 @@
 		<div style="width:100%; height: 20px; display: inline-flex">
 			<input type="checkbox" id="pen" onchange="selectPen()">Pen</input>
 			<input type="checkbox" id="erase" onchange="selectErase()" style="margin-left: 10px;">Eraser</input>
+			<input type="checkbox" id="text" onchange="selectText()" style="margin-left: 10px;">Text</input>
 			<div style="margin-left: 20px;">Select Color</div>
 			<select onchange="color(this);" class="color" id="list-color" style="margin-left: 10px;">
 				<option id="black" value="Black">Black</option>
