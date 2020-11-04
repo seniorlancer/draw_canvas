@@ -10,8 +10,9 @@
 		reader,
 		selectedText,
 		flag = false,
+		drawingFlag = false;
 		selectedTextMove = false;
-		overCanvas = true;
+		mouseDown = 0;
 		prevX = 0,
 		currX = 0,
 		prevY = 0,
@@ -31,6 +32,13 @@
 		offsetLeft = parent_div.offsetLeft;
 		offsetTop = parent_div.offsetTop;
 		reader = new FileReader();
+
+		document.body.onmousedown = function() { 
+			++mouseDown;
+		}
+		document.body.onmouseup = function() {
+			--mouseDown;
+		}
 
 		document.getElementById('btn_load').style.pointerEvents = 'none';
 		document.getElementById('btn_save').style.pointerEvents = 'none';
@@ -121,6 +129,14 @@
 		input.addEventListener('mousemove', function(e){
 			findxy('move', e)
 		});
+		input.addEventListener('mouseover', function(e) {
+			if(mouseDown && !selectedTextMove) {
+				console.log('2222222')
+				flag = true;
+			}
+		});
+		input.addEventListener('mouseleave', function(e) {
+		});
 
 		document.body.appendChild(input);
 
@@ -154,9 +170,11 @@
 	}
 
 	function handleTextAreaClick(e) {
+		console.log('1111111111111')
 		leaveTextArea();
 		this.style.resize = 'auto';
 		selectedTextMove = true;
+		flag = false;
 		selectedText = this;
 	}
  
@@ -190,20 +208,14 @@
 			}
 		}
 		if (res == 'up' || res == "out") {
-			console.log('111111111');
-			if(overCanvas){
-				flag = false;
-			}
-			if(!selectedText) {
-				selectedTextMove = false;
-			}
+			flag = false;
+			selectedTextMove = false;
 		}
 		if (res == 'move') {
 			if(selectedText && selectedTextMove) {
 				selectedText.style.left = e.clientX - canvas.offsetLeft;
 				selectedText.style.top = e.clientY - canvas.offsetTop + 20;
 			} else if (flag) {
-				overCanvas = true;
 				prevX = currX;
 				prevY = currY;
 				currX = e.clientX - canvas.offsetLeft - offsetLeft;
