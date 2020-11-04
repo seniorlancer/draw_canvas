@@ -27,7 +27,7 @@
 
 	var pen_color = "black",
 		pen_width = 2;
-		font_size = '12px';
+		font_size = '72px';
 	
 	function init() {
 		parent_div = document.getElementById('the-palace');
@@ -144,8 +144,10 @@
 		input.style.overflow = 'hidden';
 		input.style.color = pen_color;
 		input.style.fontSize = font_size;
-		input.style.height = 0;
-		input.style.height = font_size;
+		// input.style.height = 0;
+		// input.style.height = font_size;
+		input.rows = 1;
+		input.cols = 1;
 
 		input.onkeydown = handleTextAreaEnter;
 		input.onmousedown = handleTextAreaClick;
@@ -187,8 +189,14 @@
 	}
 
 	function handleTextAreaEnter(e) {
-		this.style.height = 0;
-		this.style.height = this.scrollHeight + 3;
+		if(e.key === 'Enter') {
+			this.rows += 1;
+		} else {
+			const str_value = this.value.split(/\r?\n/);
+			this.rows = str_value.length;
+			var longest = str_value.reduce(function (a, b) { return a.length > b.length ? a : b; });
+			this.cols = longest.length + 1;
+		}
 	}
 
 	function handleTextAreaClick(e) {
