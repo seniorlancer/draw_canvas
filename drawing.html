@@ -209,7 +209,8 @@
 		}
 		if (res == 'up' || res == "out") {
 			flag = false;
-			selectedTextMove = false;
+			if(!selectedText)
+				selectedTextMove = false;
 		}
 		if (res == 'move') {
 			if(selectedText && selectedTextMove) {
