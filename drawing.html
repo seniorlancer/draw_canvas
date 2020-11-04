@@ -89,6 +89,7 @@
 		let color = obj.value.toLowerCase();
 		pen_color = color;
 		if(selectedText) {
+			selectedText.focus();
 			selectedText.style.color = color;
 		}
 		// selectPen();
@@ -98,6 +99,7 @@
 		font_size = obj.value + 'px';
 		console.log(font_size);
 		if(selectedText) {
+			selectedText.focus();
 			selectedText.style.fontSize = font_size;
 			selectedText.style.height = 0;
 			selectedText.style.height = selectedText.scrollHeight + 3;
