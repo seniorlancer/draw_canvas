@@ -13,7 +13,7 @@
 		flag = false,
 		drawingFlag = false;
 		selectedTextMove = false;
-		mouseDown = 0;
+		mouseDown = true;
 		prevX = 0,
 		currX = 0,
 		prevY = 0,
@@ -38,13 +38,13 @@
 		document.body.onmousedown = function(e) { 
 			if(e.clientX >= area_canvas.left && e.clientX <= area_canvas.right && e.clientY >= area_canvas.top && e.clientY <= area_canvas.bottom) {
 				console.log('1111111111');
-				++mouseDown;
+				mouseDown = true;
 			}
 		}
 		document.body.onmouseup = function(e) {
 			if(e.clientX >= area_canvas.left && e.clientX <= area_canvas.right && e.clientY >= area_canvas.top && e.clientY <= area_canvas.bottom) {
 				console.log('2222222222');
-				--mouseDown;
+				mouseDown = false;
 			}
 		}
 
@@ -162,7 +162,6 @@
 		input.addEventListener('mouseover', function(e) {
 			console.log(mouseDown);
 			if(mouseDown && !selectedText) {
-				console.log(selectedText);
 				flag = true;
 				e.preventDefault();
 			}
