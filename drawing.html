@@ -2,6 +2,7 @@
 <head>
 	<script type="text/javascript">
 	var canvas,
+		area_canvas,
 		parent_div,
 		pen,
 		erase,
@@ -26,6 +27,7 @@
 
 	var pen_color = "black",
 		pen_width = 2;
+		font_size = '12px';
 	
 	function init() {
 		parent_div = document.getElementById('the-palace');
@@ -33,11 +35,17 @@
 		offsetTop = parent_div.offsetTop;
 		reader = new FileReader();
 
-		document.body.onmousedown = function() { 
-			++mouseDown;
+		document.body.onmousedown = function(e) { 
+			if(e.clientX >= area_canvas.left && e.clientX <= area_canvas.right && e.clientY >= area_canvas.top && e.clientY <= area_canvas.bottom) {
+				console.log('1111111111');
+				++mouseDown;
+			}
 		}
-		document.body.onmouseup = function() {
-			--mouseDown;
+		document.body.onmouseup = function(e) {
+			if(e.clientX >= area_canvas.left && e.clientX <= area_canvas.right && e.clientY >= area_canvas.top && e.clientY <= area_canvas.bottom) {
+				console.log('2222222222');
+				--mouseDown;
+			}
 		}
 
 		document.getElementById('btn_load').style.pointerEvents = 'none';
@@ -55,7 +63,7 @@
 		w = canvas.width;
 		h = canvas.height;
 
-		console.log(w);
+		area_canvas = canvas.getBoundingClientRect();
 
 		canvas.addEventListener("mousemove", function (e) {
 			findxy('move', e)
@@ -80,9 +88,23 @@
 	function color(obj) {
 		let color = obj.value.toLowerCase();
 		pen_color = color;
-		selectPen();
+		if(selectedText) {
+			selectedText.style.color = color;
+		}
+		// selectPen();
 	}
 	
+	function fontChange(obj) {
+		font_size = obj.value + 'px';
+		console.log(font_size);
+		if(selectedText) {
+			selectedText.style.fontSize = font_size;
+			selectedText.style.height = 0;
+			selectedText.style.height = selectedText.scrollHeight + 3;
+		}
+		// selectPen();
+	}
+
 	function draw() {
 		if(tool === 2) {
 			ctx.clearRect(currX, currY, 15, 15);
@@ -120,17 +142,22 @@
 		input.style.top = (currY) + 'px';
 		input.style.background = 'transparent';
 		input.style.overflow = 'hidden';
+		input.style.color = pen_color;
+		input.style.fontSize = font_size;
 
 		input.onkeydown = handleTextAreaEnter;
 		input.onmousedown = handleTextAreaClick;
 		input.addEventListener('mouseup', function(e){
+
 			selectedTextMove = false;
 		});
 		input.addEventListener('mousemove', function(e){
 			findxy('move', e)
 		});
 		input.addEventListener('mouseover', function(e) {
-			if(mouseDown && !selectedTextMove) {
+			console.log(mouseDown);
+			if(mouseDown && !selectedText) {
+				console.log(selectedText);
 				flag = true;
 			}
 		});
@@ -188,6 +215,7 @@
 			if(tool === 3) {
 				return;
 			}
+			selectedText = null;
 			prevX = currX;
 			prevY = currY;
 			currX = e.clientX - canvas.offsetLeft - offsetLeft;
@@ -275,18 +303,36 @@
 <body style="background:#ddd;" onload="init()">
 	<img id='img' style="display: none;"/>
 	<div id="the-palace" style="margin: 30px auto; max-width: 1000px; position:relative; min-height: 500px;">
-		<div style="width:100%; height: 20px; display: inline-flex">
+		<div style="width:100%; height: 20px; display: inline-flex; align-items: center;">
 			<input type="checkbox" id="pen" onchange="selectPen()">Pen</input>
 			<input type="checkbox" id="erase" onchange="selectErase()" style="margin-left: 10px;">Eraser</input>
 			<input type="checkbox" id="text" onchange="selectText()" style="margin-left: 10px;">Text</input>
-			<div style="margin-left: 20px;">Select Color</div>
-			<select onchange="color(this);" class="color" id="list-color" style="margin-left: 10px;">
+			<div style="margin-left: 20px;">Color:</div>
+			<select onchange="color(this);" class="color" id="list-color" style="margin-left: 5px;">
 				<option id="black" value="Black">Black</option>
 				<option id="green" value="Green">Green</option>
 				<option id="blue" value="Blue">Blue</option>
 				<option id="red" value="Red">Red</option>
 				<option id="pink" value="Pink">Pink</option>
 				<option id="yellow" value="Yellow">Yellow</option>
+			</select>
+			<div style="margin-left: 10px;">Font Size:</div>
+			<select onchange="fontChange(this);" id="list-font" style="margin-left: 5px;">
+				<option value="8">8</option>
+				<option alue="9">9</option>
+				<option value="10">10</option>
+				<option value="11">11</option>
+				<option value="12" selected>12</option>
+				<option  value="14">14</option>
+				<option  value="16">16</option>
+				<option value="20">20</option>
+				<option alue="22">22</option>
+				<option value="24">24</option>
+				<option value="26">26</option>
+				<option value="28">28</option>
+				<option  value="36">36</option>
+				<option  value="48">48</option>
+				<option  value="72">72</option>
 			</select>
 			<a id="downloader" download="image.png"  onclick='return save()'>
 				<input type="button" style="margin-left: 20px;" id="btn_save" value="Save" />
