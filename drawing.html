@@ -58,6 +58,7 @@
 		canvas.height = parent_div.offsetHeight;
 
 		ctx = canvas.getContext("2d");
+
 		w = canvas.width;
 		h = canvas.height;
 
@@ -124,6 +125,16 @@
 	}
 	
 	function save() {
+		var texts = document.body.children;
+		var i;
+		for(i = 0; i < texts.length; i++) {
+			if(texts[i].nodeName === 'TEXTAREA') {				
+				ctx.font = texts[i].style.fontSize + " " + window.getComputedStyle(texts[i]).fontFamily;
+				ctx.fillStyle = texts[i].style.color;
+				ctx.fillText(texts[i].value, texts[i].getBoundingClientRect().x - area_canvas.x, texts[i].getBoundingClientRect().y - area_canvas.y + parseInt(texts[i].style.fontSize, 10)); 
+			}
+		}
+		
 		document.getElementById("downloader").download = "image.png";
     	document.getElementById("downloader").href = canvas.toDataURL("image/png");
 	}
