@@ -142,10 +142,18 @@
 		var texts = document.body.children;
 		var i;
 		for(i = 0; i < texts.length; i++) {
-			if(texts[i].nodeName === 'TEXTAREA') {				
+			if(texts[i].nodeName === 'TEXTAREA') {	
+				console.log(lineHeight);
 				destCtx.font = texts[i].style.fontSize + " " + window.getComputedStyle(texts[i]).fontFamily;
 				destCtx.fillStyle = texts[i].style.color;
-				destCtx.fillText(texts[i].value, texts[i].getBoundingClientRect().x - area_canvas.x, texts[i].getBoundingClientRect().y - area_canvas.y + parseInt(texts[i].style.fontSize, 10)); 
+				var lines = texts[i].value.split('\n');
+				var x_value = texts[i].getBoundingClientRect().x - area_canvas.x;
+				var y_value = texts[i].getBoundingClientRect().y - area_canvas.y + parseInt(texts[i].style.fontSize);
+				var lineHeight = parseInt(texts[i].style.fontSize, 10) * 1.2;
+				for(var j = 0; j < lines.length; j++) {
+					destCtx.fillText(lines[j], x_value, y_value + lineHeight * j); 
+				}
+				
 			}
 		}
 
